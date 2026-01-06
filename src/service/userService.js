@@ -11,17 +11,23 @@ const hashUserPassword = (userPassword) => {
     return hashPassword;
 }
 
-const createNewUser = (email, password, username) => {
+const createNewUser = async (email, password, username) => {
+    // create the connection, specify bluebird as Promise
+    const connection = await mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        database: 'jwt',
+        Promise: bluebird,
+    });
+
     let hashPass = hashUserPassword(password);
-    connection.query(
-        'INSERT INTO users (email, password, username) VALUES (?, ?, ?)', [email, hashPass, username],
-        function(err, results, fields) {
-            if(err){
-                console.log(err)
-            }
-            console.log(results);
-        }
-    );
+    try{
+        const [rows, fields] =
+        await connection.execute('INSERT INTO users (email, password, username) VALUES (?, ?, ?)',
+            [email, hashPass, username]);
+    }catch(err){
+        console.log(">>> check error:", err);
+    }
 }
 
 const getUserList = async () => {
@@ -33,21 +39,6 @@ const getUserList = async () => {
         Promise: bluebird,
     });
     
-    let users = [];
-
-    // connection.query(
-    //     'SELECT * FROM users',
-    //     function(err, results, fields) {
-    //         if(err){
-    //             console.log(err);
-    //             return users;
-    //         }
-    //         users = results;
-    //         console.log(">>> run get user list:", users)
-    //         return users;
-    //     }
-    // );
-
     try{
         // query database
         const [rows, fields] = await connection.execute( 'SELECT * FROM users');
@@ -59,6 +50,26 @@ const getUserList = async () => {
     }
 }
 
+const deleteUser = async (id) => {
+    // create the connection, specify bluebird as Promise
+    const connection = await mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        database: 'jwt',
+        Promise: bluebird,
+    });
+    
+    try{
+        // query database
+        const [rows, fields] = await connection.execute( 'DELETE FROM users WHERE id=?', [id]);
+
+        // console.log(">>> check rows:", rows);
+        return rows;
+    }catch(err){
+        console.log(">>> check error:", err);
+    }
+}
+
 module.exports = {
-    createNewUser, getUserList
+    createNewUser, getUserList, deleteUser
 }
