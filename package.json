@@ -17,7 +17,9 @@
     "ejs": "^3.1.10",
     "express": "^4.22.1",
     "mysql2": "2.3.3",
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "sequelize": "6.13.0",
+    "sequelize-cli": "6.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
