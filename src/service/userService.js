@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import mysql from 'mysql2/promise';
 // get the promise implementation, we will use bluebird
 import bluebird from 'bluebird';
+import db from '../models/index';
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -12,19 +13,13 @@ const hashUserPassword = (userPassword) => {
 }
 
 const createNewUser = async (email, password, username) => {
-    // create the connection, specify bluebird as Promise
-    const connection = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        database: 'jwt',
-        Promise: bluebird,
-    });
-
     let hashPass = hashUserPassword(password);
     try{
-        const [rows, fields] =
-        await connection.execute('INSERT INTO users (email, password, username) VALUES (?, ?, ?)',
-            [email, hashPass, username]);
+        await db.User.create({
+            username: username,
+            email: email,
+            password: hashPass
+        })
     }catch(err){
         console.log(">>> check error:", err);
     }
@@ -41,7 +36,7 @@ const getUserList = async () => {
     
     try{
         // query database
-        const [rows, fields] = await connection.execute( 'SELECT * FROM users');
+        const [rows, fields] = await connection.execute( 'SELECT * FROM user');
 
         // console.log(">>> check rows:", rows);
         return rows;
@@ -61,7 +56,7 @@ const deleteUser = async (id) => {
     
     try{
         // query database
-        const [rows, fields] = await connection.execute( 'DELETE FROM users WHERE id=?', [id]);
+        const [rows, fields] = await connection.execute( 'DELETE FROM user WHERE id=?', [id]);
 
         // console.log(">>> check rows:", rows);
         return rows;
@@ -81,7 +76,7 @@ const getUserById = async (id) => {
     
     try{
         // query database
-        const [rows, fields] = await connection.execute( 'SELECT * FROM users WHERE id=?', [id]);
+        const [rows, fields] = await connection.execute( 'SELECT * FROM user WHERE id=?', [id]);
 
         // console.log(">>> check rows:", rows);
         return rows;
@@ -101,7 +96,7 @@ const updateUserInfor = async (email, username, id) => {
     
     try{
         // query database
-        const [rows, fields] = await connection.execute( 'UPDATE users SET email=?, username=? WHERE id=?', [email, username, id]);
+        const [rows, fields] = await connection.execute( 'UPDATE user SET email=?, username=? WHERE id=?', [email, username, id]);
 
         // console.log(">>> check rows:", rows);
         return rows;
