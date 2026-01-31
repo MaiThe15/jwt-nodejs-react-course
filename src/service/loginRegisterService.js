@@ -33,7 +33,8 @@ const registerNewUser = async (rawUserData) => {
         if(isEmailExist === true){
             return {
                 EM: 'The email is already exist',
-                EC: '1'
+                EC: '1',
+                DT: 'email'
             }
         } 
 
@@ -41,7 +42,8 @@ const registerNewUser = async (rawUserData) => {
         if(isPhoneExist === true){
             return {
                 EM: 'The phone number is already exist',
-                EC: '1'
+                EC: '1',
+                DT: 'phone'
             }
         }
 
