@@ -1,4 +1,5 @@
 import db from "../models/index";
+import loginRegisterService from "./loginRegisterService";
 
 const getAllUser = async () => {
     let data = {
@@ -40,8 +41,9 @@ const getUserWithPagination = async (page, limit) => {
         const { count, rows } = await db.User.findAndCountAll({
             offset: offset,
             limit: limit,
-            attributes: ['id', 'username', 'email', 'phone', 'sex'],
-            include: { model: db.Group, attributes: ['name', 'description'] }
+            attributes: ['id', 'username', 'email', 'phone', 'sex', 'address'],
+            include: { model: db.Group, attributes: ['name', 'description', 'id'] },
+            order: [['id', 'DESC']]
         })
         let totalPages = Math.ceil(count/limit);
         let data = {
@@ -67,7 +69,27 @@ const getUserWithPagination = async (page, limit) => {
 
 const createNewUser = async (data) => {
     try{
-        await db.User.create(data);
+        let isEmailExist = await loginRegisterService.checkEmail(data.email);
+        if(isEmailExist === true){
+            return {
+                EM: 'The email is already exist',
+                EC: '1',
+                DT: 'email'
+            }
+        } 
+
+        let isPhoneExist = await loginRegisterService.checkPhone(data.phone);
+        if(isPhoneExist === true){
+            return {
+                EM: 'The phone number is already exist',
+                EC: '1',
+                DT: 'phone'
+            }
+        }
+
+        let hashPassword = loginRegisterService.hashUserPassword(data.password);
+
+        await db.User.create({...data, password: hashPassword});
         return {
             EM: 'create ok',
             EC: 0,
@@ -80,18 +102,42 @@ const createNewUser = async (data) => {
 
 const updateUser = async (data) => {
     try{
+        if(!data.groupId){
+            return {
+                EM: 'Error with empty groupId',
+                EC: 1,
+                DT: 'group'
+            } 
+        }
         let user = await db.User.findOne({
             where: { id: data.id }
         })
         if(user){
-            user.update({
-
+            await user.update({
+                username: data.username,
+                address: data.address,
+                sex: data.sex,
+                groupId: data.groupId
             })
+            return {
+                EM: 'Update user success',
+                EC: 0,
+                DT: ''
+            }
         } else{
-
+            return {
+                EM: 'user not found',
+                EC: 1,
+                DT: ''
+            }
         }
     } catch(err){
         console.log(err);
+        return {
+            EM: 'something wrong with the services',
+            EC: 1,
+            DT: []
+        }
     }
 }
 
