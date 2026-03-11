@@ -6,6 +6,7 @@ import configCors from "./config/cors";
 require("dotenv").config();
 import bodyParser from "body-parser";
 import connection from "./config/connectDB";
+// import { createJWT, verifyToken } from "./middleware/JWTAction";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -20,7 +21,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // test connection DB
-connection();
+// connection();
+
 
 //init web routes
 initWebRoutes(app);
