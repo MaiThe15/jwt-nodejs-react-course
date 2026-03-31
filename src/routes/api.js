@@ -15,7 +15,7 @@ const router = express.Router();
 
 // }
 
-// const checkUserLogin = (req, res, next) => {
+// const checkUser = (req, res, next) => {
 //     const nonSecurePaths = ['/', '/register', '/login'];
 //     if(nonSecurePaths.includes(req.path)) return next();
 
@@ -27,10 +27,13 @@ const router = express.Router();
 // }
 
 const initApiRoutes = (app) => {
+    router.all('*', checkUserJWT, checkUserPermission);
+
     router.post("/register", apiController.handleRegister);
     router.post("/login", apiController.handleLogin);
-
-    router.get("/user/read", checkUserJWT, checkUserPermission, userController.readFunc);
+    
+    router.get("/account", userController.getUserAccount);
+    router.get("/user/read", userController.readFunc);
     router.post("/user/create", userController.createFunc);
     router.put("/user/update", userController.updateFunc);
     router.delete("/user/delete", userController.deleteFunc);

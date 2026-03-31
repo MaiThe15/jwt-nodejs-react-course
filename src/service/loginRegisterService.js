@@ -99,7 +99,7 @@ const handleUserLogin = async (rawData) => {
                 let payload = {
                     email: user.email,
                     groupWithRoles,
-                    expiresIn: process.env.JWT_EXPIRES_IN
+                    username: user.username
                 }
                 let token = createJWT(payload);
                 return {
@@ -107,7 +107,9 @@ const handleUserLogin = async (rawData) => {
                     EC: '0',
                     DT: {
                         access_token: token,
-                        groupWithRoles
+                        groupWithRoles,
+                        email: user.email,
+                        username: user.username
                     }
                 }
             }
@@ -119,7 +121,7 @@ const handleUserLogin = async (rawData) => {
             DT: ''
         }
     
-        console.log(">>> check user:", user)
+        // console.log(">>> check user:", user)
         // if(isEmailExist === false){
         //     return {
         //         EM: '',
