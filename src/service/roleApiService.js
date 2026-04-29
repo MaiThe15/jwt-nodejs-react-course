@@ -1,0 +1,36 @@
+import db from "../models/index";
+
+const createNewRoles = async (roles) => {
+    try{
+        let currentRoles = await db.Role.findAll({
+            attributes: ['url', 'description'],
+            raw: true
+        })
+
+        const persists = roles.filter(({ url: id1 }) => !currentRoles.some(({ url: id2 }) => id2 === id1));
+        if(persists.length === 0){
+            return {
+                EM: 'Nothing to create',
+                EC: 0,
+                DT: []
+            }
+        }
+        await db.Role.bulkCreate(persists);
+        return {
+            EM: 'Create roles success',
+            EC: 0,
+            DT: []
+        }
+    } catch(error){
+        console.log(err);
+        return {
+            EM: 'something wrong with the services',
+            EC: 1,
+            DT: []
+        }
+    }
+}
+
+module.exports = {
+    createNewRoles
+}
