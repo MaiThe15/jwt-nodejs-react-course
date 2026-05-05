@@ -51,6 +51,45 @@ const getAllRoles = async () => {
     }
 }
 
+const updateRole = async (data) => {
+    try{
+        // if(!data.groupId){
+        //     return {
+        //         EM: 'Error with empty groupId',
+        //         EC: 1,
+        //         DT: 'group'
+        //     } 
+        // }
+        let role = await db.Role.findOne({
+            where: { id: data.id }
+        })
+        if(role){
+            await role.update({
+                url: data.url,
+                description: data.description
+            })
+            return {
+                EM: 'Update role success',
+                EC: 0,
+                DT: ''
+            }
+        } else{
+            return {
+                EM: 'Role not found',
+                EC: 1,
+                DT: ''
+            }
+        }
+    } catch(err){
+        console.log(err);
+        return {
+            EM: 'something wrong with the services',
+            EC: 1,
+            DT: []
+        }
+    }
+}
+
 const deleteRole = async (id) => {
     try{
         let role = await db.Role.findOne({
@@ -75,5 +114,5 @@ const deleteRole = async (id) => {
 }
 
 module.exports = {
-    createNewRoles, getAllRoles, deleteRole
+    createNewRoles, getAllRoles, updateRole, deleteRole
 }
